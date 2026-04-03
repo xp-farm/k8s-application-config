@@ -159,3 +159,10 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+# Allow http for debuging
+extraEnv:
+  - name: KC_PROXY
+    value: edge
+  - name: KC_HTTP_ENABLED
+    value: "true"
