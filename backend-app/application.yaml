@@ -8,7 +8,7 @@ spec:
   source:
     repoURL: https://github.com/xp-farm/k8s-application-config.git
     targetRevision: main
-    path: old-monolith
+    path: backend-app
     directory:
       recurse: true
   destination:
