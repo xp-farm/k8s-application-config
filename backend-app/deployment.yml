@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: old-monolith       # Deployment's name, pod names will be derived from this
+  labels:
+    app: old-monolith      # Deployment's label, doesn't have anything to do with pods, can be random
+    component: backend
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: old-monolith     # (1) It tells deplyoments - I need to manage pods with this label
+  template:
+    metadata:
+      labels:
+        app: old-monolith   # (1) It tells deploymnet - you need to put this label to pod you create
+    spec:
+      containers:
+      - name: old-monolith  # Container's name inside of the pod. Used within k exec -it pod -c old-monolith
+        image: 38136000/old-monolith:1.0.0 # TODO: change to use different version
+        ports:
+        - containerPort: 8080
+        env:
+          - name: DATABASE_HOST
+            value: postgres
+          - name: DATABASE_PORT
+            value: "5432"
+          - name: DATABASE_PASSWORD
+            value: super
+          - name: DATABASE_USER
+            value: postgres
+          - name: DATABASE_SCHEMA
+            value: postgres

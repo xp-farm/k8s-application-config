@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres          # statefulset name, pod names will be derived from this
+spec:
+  selector:
+    matchLabels:
+      app: postgres       # pods that have this label will be managed by statefulset (1)
+  serviceName: "postgres"
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: postgres     # gives this label to every pod it creates (1)
+    spec:
+      containers:
+      - name: postgres    # container name inside of the pod
+        image: postgres:latest
+        ports:
+        - containerPort: 5432
+          name: postgres
+        env:
+            - name: POSTGRES_PASSWORD
+              value: super
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_MULTIPLE_DATABASES
+              value: xplorer,encounters,tours
+            - name: POSTGRES_HOST_AUTH_METHOD # adds record in pg_hba.conf and allows clients to connect from other servers
+              value: scram-sha-256
+
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/18
+          name: postgredb
+        - mountPath: /docker-entrypoint-initdb.d
+          name: initdb
+      volumes:
+        - name: initdb
+          configMap:
+            name: postgres-init
+  volumeClaimTemplates:
+  - metadata:
+      name: postgredb
+    spec:
+      accessModes: [ "ReadWriteMany" ]
+      storageClassName: manual                # means that Persisnet Volume already exists, no auto-provisioning
+      resources:
+        requests:
+          storage: 1Gi
